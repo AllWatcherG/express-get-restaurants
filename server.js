@@ -23,6 +23,40 @@ app.get('/restaurants/:id', async(req, res) => {
 
 })
 
+app.use(express.json())
+app.use(express.urlencoded())
+
+app.post('/restaurants', async(req, res) => {
+  objToCreate = req.body
+  await Restaurant.create(objToCreate)
+  res.json(await Restaurant.findAll())
+})
+
+app.put('/restaurants/:id', async(req, res) => {
+  objKeyToReplace = parseInt(req.params.id)
+
+  objFound = await Restaurant.findByPk(objKeyToReplace)
+  // objFound.name = req.body.name
+  // this method of updating can be used to update one or all parameters through the body in post
+  objFound.update({
+    name: req.body.name,
+    location: req.body.location,
+    cuisine: req.body.cuisine
+  })
+  // objFound.cuisine = req.body.cuisine
+  // For future cases add await model.save to save to database!
+  // await objFound.save
+  res.json(await Restaurant.findByPk(objKeyToReplace))
+
+})
+
+app.delete('/restaurants/:id', async(req, res) => {
+  objKeyToDelete = parseInt(req.params.id)
+  objFound = await Restaurant.findByPk(objKeyToDelete)
+  await objFound.destroy()
+  res.json(await Restaurant.findAll())
+})
+
 app.listen(port, () => {
     sequelize.sync();
     console.log(`Your server is listening on port http://localhost:${port}/restaurants/1`);
