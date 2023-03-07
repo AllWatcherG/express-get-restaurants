@@ -25,10 +25,16 @@ router.get('/:id', async(req, res) => {
 
 
 
-router.post('/', async(req, res) => {
-  objToCreate = req.body
-  await Restaurant.create(objToCreate)
-  res.json(await Restaurant.findAll())
+router.post('/',[check(["name", "location", "cuisine"]).not().isEmpty().trim()],  async(req, res) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        res.json({error: errors.array()})
+    } 
+    else{
+        objToCreate = req.body
+        await Restaurant.create(objToCreate)
+        res.json(await Restaurant.findAll())
+    }
 })
 
 router.put('/:id', async(req, res) => {
